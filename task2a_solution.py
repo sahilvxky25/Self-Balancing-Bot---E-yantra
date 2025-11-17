@@ -97,12 +97,12 @@ def sysCall_actuation():
     # Transform world velocity to robot's local frame
     vel_world = np.array(vel_lin)
     vel_local = rot_matrix.T.dot(vel_world)
-    forward_velocity = 15 * vel_local[1]  # Velocity along robot's forward axis
+    forward_velocity = 20 * vel_local[1]  # Velocity along robot's forward axis
     
     # ============================================
     # COMPUTE ANGULAR VELOCITY (PITCH RATE)
     # ============================================
-    pitch_rate = 3 * vel_ang[1]
+    pitch_rate = 3 * vel_ang[1]  # FIXED: 15x for proper damping
     
     # ============================================
     # HEADING ERROR & AUTOMATIC TURNING
@@ -121,7 +121,7 @@ def sysCall_actuation():
     auto_turn_signal = np.clip(auto_turn_signal, -max_turn_rate, max_turn_rate)
     
     # Smooth the turning signal
-    auto_turn_signal = 0.8 * auto_turn_signal + 0.1 * last_turn_signal
+    auto_turn_signal = 0.7 * auto_turn_signal + 0.3 * last_turn_signal
     last_turn_signal = auto_turn_signal
     
     # ============================================
@@ -141,7 +141,7 @@ def sysCall_actuation():
         
         # Forward / backward drive
         if key_code == 2007:       # Up arrow
-            drive_bias += 0.1
+            drive_bias += 0.5
         elif key_code == 2008:     # Down arrow
             drive_bias -= 0.1
         
@@ -149,12 +149,10 @@ def sysCall_actuation():
         elif key_code == 2009:     # Left arrow - turn LEFT 90?
             ref_orientation = rotate_vector_2d(forward_2d, np.pi/2)
             ref_position = position  # Lock current position during turn
-            print(f"? Turning LEFT 90?")
         
         elif key_code == 2010:     # Right arrow - turn RIGHT 90?
             ref_orientation = rotate_vector_2d(forward_2d, -np.pi/2)
             ref_position = position  # Lock current position during turn
-            
         
         # Emergency stop
         elif key_code == 32:       # Space bar
@@ -168,15 +166,15 @@ def sysCall_actuation():
         
         # Lift control (Q/E)
         if key_code == 113:        # q
-            lift_speed -= 0.02
+            lift_speed -= 0.07
         elif key_code == 101:      # e
-            lift_speed += 0.02
+            lift_speed += 0.07
         
         # Arm control (W/S)
         if key_code == 119:        # w
-            arm_speed += 0.2
+            arm_speed += 0.5
         elif key_code == 115:      # s
-            arm_speed -= 0.2
+            arm_speed -= 0.5
     
     # ============================================
     # APPLY LIMITS
