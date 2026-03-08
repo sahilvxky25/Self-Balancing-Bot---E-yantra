@@ -1,4 +1,4 @@
-# E-yantra-team-1321
+# Self Balncing Bot - E-yantra
 ## 2025-26
 Participants 
 Sahil Patra
